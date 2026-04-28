@@ -24,3 +24,5 @@ Thumbs.db
 # Debug Tests
 tests/debug_*.spec.js
 
+# HTML Reports/Files
+*.html
