@@ -67,4 +67,37 @@ test.describe('Dashboard Statistics Tests', () => {
     await dashboardPage.verifyRegisteredNavigation();
   });
 
+  test('Should verify first row of New Applications table', async ({ page }) => {
+    test.setTimeout(60000);
+    const dashboardPage = new DashboardPage(page);
+
+    const appId = await dashboardPage.getFirstRowAppId();
+    const student = await dashboardPage.getFirstRowStudent();
+    const university = await dashboardPage.getFirstRowUniversity();
+    const consultant = await dashboardPage.getFirstRowConsultant();
+    const admissionOfficer = await dashboardPage.getFirstRowAdmissionOfficer();
+    const assessment = await dashboardPage.getFirstRowAssessment();
+    const date = await dashboardPage.getFirstRowDate();
+
+    console.log(`First Row Table Data:
+      APP ID: ${appId}
+      Student: ${student}
+      University: ${university}
+      Consultant: ${consultant}
+      Admission Officer: ${admissionOfficer}
+      Assessment: ${assessment}
+      Date: ${date}`);
+
+    expect(appId).toBeTruthy();
+    expect(student).toBeTruthy();
+    expect(university).toBeTruthy();
+    expect(consultant).toBeTruthy();
+    expect(admissionOfficer).toBeTruthy();
+    expect(assessment).toBeTruthy();
+    expect(date).toBeTruthy();
+    
+    expect(appId.trim()).toMatch(/^APP\d+/);
+  });
+
 });
+

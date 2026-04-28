@@ -172,7 +172,45 @@ class DashboardPage {
         console.log('Successfully verified Registered navigation!');
         await this.page.goBack();
     }
+
+    async getFirstRowAppId() {
+
+        await this.dashboardLocators.firstRowAppId.waitFor();
+        return await this.dashboardLocators.firstRowAppId.textContent();
+    }
+
+    async getFirstRowStudent() {
+        await this.dashboardLocators.firstRowStudent.waitFor();
+        return await this.dashboardLocators.firstRowStudent.textContent();
+    }
+
+    async getFirstRowUniversity() {
+        await this.dashboardLocators.firstRowUniversity.waitFor();
+        return await this.dashboardLocators.firstRowUniversity.textContent();
+    }
+
+    async getFirstRowConsultant() {
+        await this.dashboardLocators.firstRowConsultant.waitFor();
+        return await this.dashboardLocators.firstRowConsultant.textContent();
+    }
+
+    async getFirstRowAdmissionOfficer() {
+        await this.dashboardLocators.firstRowAdmissionOfficer.waitFor();
+        return await this.dashboardLocators.firstRowAdmissionOfficer.textContent();
+    }
+
+    async getFirstRowAssessment() {
+        await this.dashboardLocators.firstRowAssessment.waitFor();
+        return await this.dashboardLocators.firstRowAssessment.textContent();
+    }
+
+    async getFirstRowDate() {
+        await this.dashboardLocators.firstRowDate.waitFor();
+        return await this.dashboardLocators.firstRowDate.textContent();
+    }
 }
+
+
 
 
 
