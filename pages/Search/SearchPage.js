@@ -1,208 +1,154 @@
+const { expect } = require('@playwright/test');
 const { SearchPageLocators } = require('./SearchPageLocators');
 
 class SearchPage {
     constructor(page) {
         this.page = page;
         this.searchLocators = new SearchPageLocators(page);
-        this.maxStudentsToCheck = 10;
     }
 
     async clickAllStudentDropdown() {
         await this.searchLocators.allStudentDropdown.click({ force: true });
-        await this.wait(1000);
+        await this.page.waitForTimeout(1000);
     }
 
     async selectStudentAndClickApply() {
-        for (let studentNumber = 1; studentNumber <= this.maxStudentsToCheck; studentNumber++) {
-            console.log(`Checking student #${studentNumber}...`);
+        for (let i = 1; i <= 10; i++) {
+            console.log(`Checking student #${i}...`);
 
-            await this.chooseStudent(studentNumber);
+            // Pick student number 'i'
+            await this.searchLocators.studentListOption.nth(i).dispatchEvent('click');
+            await this.page.waitForTimeout(2000);
 
-            const applyButtonWasClicked = await this.clickFirstEnabledApplyNowButton();
-            if (applyButtonWasClicked) {
-                return;
+            // Smart Apply Now detection logic (integrating user approach)
+            const applyButtons = this.page.getByRole('button', { name: 'Apply Now' });
+            const buttonCount = await applyButtons.count();
+            console.log(`Found ${buttonCount} 'Apply Now' buttons for this student`);
+
+            for (let j = 0; j < buttonCount; j++) {
+                const btn = applyButtons.nth(j);
+                if (await btn.isEnabled()) {
+                    console.log(`Success! Found an enabled Apply button at index ${j}.`);
+                    console.log('Clicking Apply Now...');
+                    await btn.click();
+                    await this.page.waitForLoadState('load');
+                    console.log('Apply Now clicked. Waiting for modal content...');
+                    await this.page.waitForTimeout(4000);
+                    return;
+                } else {
+                    console.log(`Button at index ${j} is not enabled, skipping...`);
+                }
             }
 
-            console.log('No enabled Apply button for this student. Trying next one...');
-            await this.clickAllStudentDropdown();
+            console.log("No enabled Apply button for this student. Trying next one...");
+            await this.searchLocators.allStudentDropdown.click({ force: true });
+            await this.page.waitForTimeout(1000);
         }
-
-        throw new Error(`Could not find any student with an active Apply Now button after ${this.maxStudentsToCheck} attempts.`);
+        throw new Error("Could not find any student with an active Apply Now button after 10 attempts.");
     }
 
-    async chooseStudent(studentNumber) {
-        await this.searchLocators.studentListOption.nth(studentNumber).dispatchEvent('click');
-        await this.wait(2000);
-    }
-
-    async clickFirstEnabledApplyNowButton() {
-        const applyButtons = this.page.getByRole('button', { name: 'Apply Now' });
-        const buttonCount = await applyButtons.count();
-
-        console.log(`Found ${buttonCount} 'Apply Now' buttons for this student`);
-
-        for (let index = 0; index < buttonCount; index++) {
-            const applyButton = applyButtons.nth(index);
-
-            if (!(await applyButton.isEnabled())) {
-                console.log(`Button at index ${index} is not enabled, skipping...`);
-                continue;
-            }
-
-            console.log(`Success! Found an enabled Apply button at index ${index}.`);
-            console.log('Clicking Apply Now...');
-
-            await applyButton.click();
-            await this.page.waitForLoadState('load');
-            await this.wait(4000);
-
-            return true;
-        }
-
-        return false;
-    }
 
     async applycard() {
-        const intakeButton = await this.findIntakeButton();
-        const intakeText = await intakeButton.innerText();
-
-        console.log('Found intake:', intakeText);
-
-        if (await intakeButton.isEnabled()) {
-            console.log('Intake button enabled - clicking');
-            await intakeButton.click({ force: true });
-            await this.wait(2000);
-        }
-    }
-
-    async findIntakeButton() {
+        let firstIntake = this.searchLocators.intakeButton;
         console.log('Waiting for intake button to be visible...');
 
         try {
-            await this.searchLocators.intakeButton.waitFor({ state: 'visible', timeout: 15000 });
-            return this.searchLocators.intakeButton;
-        } catch (error) {
+            await firstIntake.waitFor({ state: 'visible', timeout: 15000 });
+        } catch (e) {
             console.log('span.filter-button not found, trying generic .filter-button...');
+            firstIntake = this.page.locator('.filter-button').first();
+            await firstIntake.waitFor({ state: 'visible', timeout: 15000 });
+        }
 
-            const fallbackIntakeButton = this.page.locator('.filter-button').first();
-            await fallbackIntakeButton.waitFor({ state: 'visible', timeout: 15000 });
+        const intakeText = await firstIntake.innerText();
+        console.log('Found intake:', intakeText);
 
-            return fallbackIntakeButton;
+        if (await firstIntake.isEnabled()) {
+            console.log('Intake button enabled â€” clicking (forced)');
+            await firstIntake.click({ force: true });
+            console.log('clicked intake button');
+            await this.page.waitForTimeout(2000);
         }
     }
 
     async campusselect() {
         console.log('Waiting for Campus City section...');
 
-        const dropdown = this.campusDropdown();
+        // Target the specific React-Select control under the Campus City label
+        const dropdown = this.page.locator('div:has-text("Campus City")').locator('[class*="-control"]').first();
 
         try {
             await dropdown.waitFor({ state: 'visible', timeout: 10000 });
-            await this.selectCampusByTyping(dropdown, 'London');
+            console.log('Campus dropdown found. Clicking to open...');
+            await dropdown.click({ force: true });
+            await this.page.waitForTimeout(1000);
+
+            console.log('Typing "London" to filter options...');
+            await this.page.keyboard.type('London');
+            await this.page.waitForTimeout(1000);
+
+            console.log('Pressing Enter to select...');
+            await this.page.keyboard.press('Enter');
+            await this.page.waitForTimeout(1000);
+
             console.log('Campus selection completed.');
-        } catch (error) {
+        } catch (e) {
             console.log('Standard React-Select interaction failed, trying fallback click...');
-            await this.selectCampusFallback(dropdown, 'London');
+            await dropdown.click({ force: true });
+            await this.page.locator('div[id*="-option-"]').filter({ hasText: /London/i }).first().click({ force: true }).catch(() => { });
         }
 
-        await this.wait(2000);
-    }
-
-    campusDropdown() {
-        return this.page
-            .locator('div:has-text("Campus City")')
-            .locator('[class*="-control"]')
-            .first();
-    }
-
-    async selectCampusByTyping(dropdown, campusName) {
-        console.log('Campus dropdown found. Clicking to open...');
-        await dropdown.click({ force: true });
-        await this.wait(1000);
-
-        console.log(`Typing "${campusName}" to filter options...`);
-        await this.page.keyboard.type(campusName);
-        await this.wait(1000);
-
-        console.log('Pressing Enter to select...');
-        await this.page.keyboard.press('Enter');
-        await this.wait(1000);
-    }
-
-    async selectCampusFallback(dropdown, campusName) {
-        await dropdown.click({ force: true });
-
-        await this.page
-            .locator('div[id*="-option-"]')
-            .filter({ hasText: new RegExp(campusName, 'i') })
-            .first()
-            .click({ force: true })
-            .catch(() => {});
+        await this.page.waitForTimeout(2000);
     }
 
     async deliverApplication() {
         console.log('Waiting for final application screen...');
 
-        await this.waitForApplicationForm();
+        // Wait for ANY proceed button or checkbox to signify the modal is ready
+        const finalIndicator = this.page.locator('button:has-text("Apply"), button:has-text("Submit"), input[type="checkbox"]').first();
+        await finalIndicator.waitFor({ state: 'visible', timeout: 20000 }).catch(() => console.log('Final screen indicator wait timed out'));
 
         console.log('Final screen reached. Selecting options...');
-        await this.wait(2000);
+        await this.page.waitForTimeout(2000);
 
-        await this.clickOptionIfVisible(
-            this.page.getByText('Full Time (4 Years)').first(),
-            'Selecting Study Mode: Full Time (4 Years)...'
-        );
-
-        await this.clickOptionIfVisible(
-            this.page.getByText(/Standard|Campus/i).first(),
-            'Selecting Delivery Mode...'
-        );
-
-        await this.clickOptionIfVisible(
-            this.page.getByText(/Standard|Face to Face/i).first(),
-            'Selecting Attendance...'
-        );
-
-        await this.clickOptionIfVisible(
-            this.page.locator('label:has-text("Are you sure"), input[type="checkbox"]').first(),
-            'Checking confirmation...'
-        );
-
-        await this.submitFinalApplication();
-    }
-
-    async waitForApplicationForm() {
-        const finalIndicator = this.page
-            .locator('button:has-text("Apply"), button:has-text("Submit"), input[type="checkbox"]')
-            .first();
-
-        await finalIndicator
-            .waitFor({ state: 'visible', timeout: 20000 })
-            .catch(() => console.log('Final screen indicator wait timed out'));
-    }
-
-    async clickOptionIfVisible(locator, message) {
-        if (!(await locator.isVisible())) {
-            return;
+        // 1. Study Mode - Click the visible text label
+        const studyMode = this.page.getByText('Full Time (4 Years)').first();
+        if (await studyMode.isVisible()) {
+            console.log('Selecting Study Mode: Full Time (4 Years)...');
+            await studyMode.click({ force: true }).catch(() => studyMode.dispatchEvent('click'));
+            await this.page.waitForTimeout(1000);
         }
 
-        console.log(message);
-        await locator.click({ force: true }).catch(() => locator.dispatchEvent('click'));
-        await this.wait(1000);
-    }
+        // 2. Delivery Mode - Click by text label
+        const deliveryMode = this.page.getByText(/Standard|Campus/i).first();
+        if (await deliveryMode.isVisible()) {
+            console.log('Selecting Delivery Mode...');
+            await deliveryMode.click({ force: true }).catch(() => deliveryMode.dispatchEvent('click'));
+            await this.page.waitForTimeout(1000);
+        }
 
-    async submitFinalApplication() {
-        const applyButton = this.page.locator('button.apply-btn, button:has-text("Apply")').first();
+        // 3. Attendance - Click by text label
+        const attendance = this.page.getByText(/Standard|Face to Face/i).first();
+        if (await attendance.isVisible()) {
+            console.log('Selecting Attendance...');
+            await attendance.click({ force: true }).catch(() => attendance.dispatchEvent('click'));
+            await this.page.waitForTimeout(1000);
+        }
 
-        if (await applyButton.isEnabled()) {
+        // 4. Confirm Checkbox
+        const confirm = this.page.locator('label:has-text("Are you sure"), input[type="checkbox"]').first();
+        if (await confirm.isVisible()) {
+            console.log('Checking confirmation...');
+            await confirm.click({ force: true }).catch(() => confirm.dispatchEvent('click'));
+        }
+
+        // 5. Final Apply
+        const applyBtn = this.page.locator('button.apply-btn, button:has-text("Apply")').first();
+        if (await applyBtn.isEnabled()) {
             console.log('Submitting final application...');
-            await applyButton.click({ force: true });
-            await this.wait(3000);
+            await applyBtn.click({ force: true });
+            await this.page.waitForTimeout(3000);
         }
-    }
-
-    async wait(milliseconds) {
-        await this.page.waitForTimeout(milliseconds);
     }
 }
 
