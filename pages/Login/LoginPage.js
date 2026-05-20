@@ -13,7 +13,6 @@ class LoginPage {
 
   async enterEmailAndContinue(email) {
     await this.loginLocators.emailInput.fill(email);
-    await this.loginLocators.continueButton.click();
   }
 
   async enterPasswordAndLogin(password) {

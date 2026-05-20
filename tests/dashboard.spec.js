@@ -9,8 +9,8 @@ test.describe('Dashboard Statistics Tests', () => {
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue('afsana.alam@uapp.uk');
-    await loginPage.enterPasswordAndLogin('Admin1212@');
+    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
+    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
   });
 
   test('Should verify dashboard statistics cards', async ({ page }) => {

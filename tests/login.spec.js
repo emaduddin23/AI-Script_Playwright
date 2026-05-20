@@ -12,10 +12,10 @@ test.describe('Login Tests', () => {
     const dashboardPage = new DashboardPage(page);
 
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue('afsana.alam@uapp.uk');
+    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
     
     // Using your test password
-    await loginPage.enterPasswordAndLogin('Admin1212@');
+    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
 
     // Verify we reached the dashboard
     await dashboardPage.verifyGreeting('Afsana Alam!');
