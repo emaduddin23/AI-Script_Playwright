@@ -28,6 +28,17 @@ class DashboardPageLocators {
         this.firstRowAdmissionOfficer = this.firstRow.locator('td').nth(4);
         this.firstRowAssessment = this.firstRow.locator('td').nth(5);
         this.firstRowDate = this.firstRow.locator('td').nth(6);
+
+        // Ready to Apply Section - targets the specific card with h5 text "Ready to Apply"
+        this.readyToApplyCount = page.locator('div.custom-card-border').filter({ has: page.locator('h5', { hasText: 'Ready to Apply' }) }).locator('span.count-summery');
+
+        // Admission Officer Table (2nd table on the page)
+        this.admissionOfficerTable = page.locator('table').nth(1);
+        this.admOfficerFirstRow = this.admissionOfficerTable.locator('tbody tr').first();
+        this.admOfficerFirstRowId = this.admOfficerFirstRow.locator('td').nth(0);
+        this.admOfficerFirstRowName = this.admOfficerFirstRow.locator('td').nth(1);
+        this.admOfficerFirstRowEmail = this.admOfficerFirstRow.locator('td').nth(2);
+        this.admOfficerFirstRowApplications = this.admOfficerFirstRow.locator('td').nth(3);
     }
 }
 

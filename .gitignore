@@ -26,3 +26,8 @@ tests/debug_*.spec.js
 
 # HTML Reports/Files
 *.html
+# image 
+*.png
+*.jpg
+*.jpeg
+images/

@@ -14,12 +14,10 @@ test('UAPP Portal exact flow match', async ({ page }) => {
   await loginPage.goto();
 
   // 2. Enter the email and 3. click the continue button
-  await loginPage.enterEmailAndContinue('afsana.alam@uapp.uk');
+  await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
 
   // 4. enter the password and 5. click the log in button
-  // ⚠️ ACTION REQUIRED: Put your real password below! ⚠️
-  const password = 'Admin1212@';
-  await loginPage.enterPasswordAndLogin(password);
+  await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
 
   // 6. verify the dashboard message 'Hello, Afsana Alam!'
   await dashboardPage.verifyGreeting('Afsana Alam!');

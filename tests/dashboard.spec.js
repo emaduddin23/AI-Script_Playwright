@@ -9,8 +9,8 @@ test.describe('Dashboard Statistics Tests', () => {
   test.beforeEach(async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue('afsana.alam@uapp.uk');
-    await loginPage.enterPasswordAndLogin('Admin1212@');
+    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
+    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
   });
 
   test('Should verify dashboard statistics cards', async ({ page }) => {
@@ -97,6 +97,39 @@ test.describe('Dashboard Statistics Tests', () => {
     expect(date).toBeTruthy();
     
     expect(appId.trim()).toMatch(/^APP\d+/);
+  });
+
+  test('Should verify Ready to Apply count', async ({ page }) => {
+    test.setTimeout(60000);
+    const dashboardPage = new DashboardPage(page);
+
+    const readyToApply = await dashboardPage.getReadyToApplyCount();
+    console.log(`Ready to Apply Count: ${readyToApply}`);
+
+    // Value should be a number (can be 0)
+    expect(readyToApply).not.toBeNull();
+    expect(readyToApply.trim()).toMatch(/^\d+$/);
+  });
+
+  test('Should verify first row of Admission Officer table', async ({ page }) => {
+    test.setTimeout(60000);
+    const dashboardPage = new DashboardPage(page);
+
+    const id = await dashboardPage.getAdmOfficerFirstRowId();
+    const name = await dashboardPage.getAdmOfficerFirstRowName();
+    const email = await dashboardPage.getAdmOfficerFirstRowEmail();
+    const applications = await dashboardPage.getAdmOfficerFirstRowApplications();
+
+    console.log(`Admission Officer First Row:
+      UAPP ID: ${id}
+      Name: ${name}
+      Email: ${email}
+      Applications: ${applications}`);
+
+    expect(id.trim()).toMatch(/^ADO\d+/);
+    expect(name).toBeTruthy();
+    expect(email).toContain('@');
+    expect(applications).toBeTruthy();
   });
 
 });

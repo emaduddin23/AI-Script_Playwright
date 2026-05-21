@@ -208,6 +208,33 @@ class DashboardPage {
         await this.dashboardLocators.firstRowDate.waitFor();
         return await this.dashboardLocators.firstRowDate.textContent();
     }
+
+    // Ready to Apply Section
+    async getReadyToApplyCount() {
+        await this.dashboardLocators.readyToApplyCount.waitFor();
+        return await this.dashboardLocators.readyToApplyCount.textContent();
+    }
+
+    // Admission Officer Table
+    async getAdmOfficerFirstRowId() {
+        await this.dashboardLocators.admOfficerFirstRowId.waitFor();
+        return await this.dashboardLocators.admOfficerFirstRowId.textContent();
+    }
+
+    async getAdmOfficerFirstRowName() {
+        await this.dashboardLocators.admOfficerFirstRowName.waitFor();
+        return await this.dashboardLocators.admOfficerFirstRowName.textContent();
+    }
+
+    async getAdmOfficerFirstRowEmail() {
+        await this.dashboardLocators.admOfficerFirstRowEmail.waitFor();
+        return await this.dashboardLocators.admOfficerFirstRowEmail.textContent();
+    }
+
+    async getAdmOfficerFirstRowApplications() {
+        await this.dashboardLocators.admOfficerFirstRowApplications.waitFor();
+        return await this.dashboardLocators.admOfficerFirstRowApplications.textContent();
+    }
 }
 
 
