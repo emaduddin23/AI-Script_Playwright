@@ -1,0 +1,192 @@
+
+
+==================== Getting Started ====================
+
+
+
+==================== Quick Start Guide ====================
+
+
+
+==================== API Reference ====================
+MeetingEngine
+Docs
+Quick Start
+API Reference
+Sign In
+Get Started Free
+
+DOCUMENTATION
+
+Getting Started
+Quick Start Guide
+API Reference
+React SDK
+API Reference
+
+All endpoints require the X-Api-Key header.
+
+Authentication
+
+curl -H "X-Api-Key: me_live_your_key_here" https://your-api.com/api/v1/rooms
+Copy
+POST
+/api/v1/rooms
+Create a room
+
+Request Body
+
+{"roomName": "my-room", "maxParticipants": 10, "emptyTimeoutSeconds": 300}
+Copy
+
+Response
+
+{"success": true, "data": {"sid": "RM_...", "name": "my-room", "numParticipants": 0}}
+Copy
+GET
+/api/v1/rooms
+List all rooms
+
+Response
+
+{"success": true, "data": [{"sid": "RM_...", "name": "my-room", "numParticipants": 2}]}
+Copy
+GET
+/api/v1/rooms/{name}
+Get a specific room
+
+Response
+
+{"success": true, "data": {"sid": "RM_...", "name": "my-room", "numParticipants": 2}}
+Copy
+DELETE
+/api/v1/rooms/{name}
+Delete a room
+
+Response
+
+{"success": true, "data": {"deleted": true}}
+Copy
+POST
+/api/v1/tokens
+Generate a participant token
+
+Request Body
+
+{"roomName": "my-room", "participantIdentity": "user-1", "participantName": "Alice", "canPublish": true, "canSubscribe": true}
+Copy
+
+Response
+
+{"success": true, "data": {"token": "eyJ...", "serverUrl": "wss://...", "roomName": "my-room"}}
+Copy
+POST
+/api/v1/recordings/start
+Start recording a room
+
+Request Body
+
+{"roomName": "my-room", "fileOutputPath": "/recordings/meeting.mp4"}
+Copy
+
+Response
+
+{"success": true, "data": {"egressId": "EG_...", "status": "active"}}
+Copy
+POST
+/api/v1/recordings/{egressId}/stop
+Stop a recording
+
+Response
+
+{"success": true, "data": {"egressId": "EG_...", "status": "complete"}}
+Copy
+
+
+==================== React SDK ====================
+MeetingEngine
+Docs
+Quick Start
+API Reference
+Sign In
+Get Started Free
+
+DOCUMENTATION
+
+Getting Started
+Quick Start Guide
+API Reference
+React SDK
+React SDK
+
+@meeting-engine/react provides hooks and components for building meeting UIs.
+
+Installation
+npm install @meeting-engine/react
+Copy
+
+Requires React 18+ as a peer dependency.
+
+useMeetingSession
+
+The main hook that manages the entire meeting lifecycle.
+
+import { useMeetingSession } from '@meeting-engine/react'
+
+const meeting = useMeetingSession({
+  serverUrl: 'wss://your-server.com',   // From token API response
+  token: 'eyJ...',                       // JWT from /api/v1/tokens
+  roomName: 'my-room',
+  userName: 'Alice',
+  participantIdentity: 'user-1',
+})
+Copy
+Returned State
+Property	Type	Description
+phase	'preview' | 'connecting' | 'live' | 'reconnecting' | 'error'	Current connection state
+participants	MeetingParticipant[]	All participants in the room
+audioOn	boolean	Local microphone state
+videoOn	boolean	Local camera state
+sharingOn	boolean	Screen sharing state
+chatMessages	ChatMessage[]	Chat message history
+participantCount	number	Total participant count
+elapsedLabel	string	Meeting duration (HH:MM:SS)
+Actions
+Method	Description
+connect()	Join the meeting room
+disconnect()	Leave the meeting
+toggleMic()	Toggle microphone on/off
+toggleCam()	Toggle camera on/off
+toggleShare()	Toggle screen sharing
+toggleNoiseCancellation()	Toggle Krisp noise cancellation
+sendChatMessage(text)	Send a chat message
+selectCamera(deviceId)	Switch camera device
+selectMicrophone(deviceId)	Switch microphone device
+setVirtualBackground(option)	Set blur or image background
+Components
+
+Pre-built UI components for common meeting elements:
+
+<VideoTrack />
+
+Renders a video track from a participant
+
+<AudioTrack />
+
+Plays audio from a participant
+
+<ParticipantTile />
+
+Complete participant tile with video, name, and status
+
+<ScreenShareView />
+
+Renders screen share content
+
+<ConnectionQualityIndicator />
+
+Shows connection quality bars
+
+<DeviceSelector />
+
+Dropdown for camera/mic/speaker selection
