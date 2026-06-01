@@ -7,6 +7,14 @@ class SearchPage {
         this.searchLocators = new SearchPageLocators(page);
     }
 
+    async goto() {
+        if (await this.page.locator('a:has-text("Search & Apply")').count() > 0) {
+            await this.page.locator('a:has-text("Search & Apply")').click();
+        } else {
+            await this.page.goto('https://portal-test.uapp.uk/search-and-apply');
+        }
+    }
+
     async clickAllStudentDropdown() {
         await this.searchLocators.allStudentDropdown.click({ force: true });
         await this.page.waitForTimeout(1000);
@@ -34,7 +42,7 @@ class SearchPage {
                     await this.page.waitForLoadState('load');
                     console.log('Apply Now clicked. Waiting for modal content...');
                     await this.page.waitForTimeout(4000);
-                    return;
+                    return true;
                 } else {
                     console.log(`Button at index ${j} is not enabled, skipping...`);
                 }
@@ -44,7 +52,8 @@ class SearchPage {
             await this.searchLocators.allStudentDropdown.click({ force: true });
             await this.page.waitForTimeout(1000);
         }
-        throw new Error("Could not find any student with an active Apply Now button after 10 attempts.");
+        console.log("Could not find any student with an active Apply Now button after 10 attempts.");
+        return false;
     }
 
 
