@@ -4,7 +4,8 @@ class ApplicationsPageLocators {
         this.applicationsNav = page.locator('a[href="/applications"]');
 
         // Search and filters
-        this.searchInput = page.locator('input[placeholder="Search"]');
+        this.moreFiltersButton = page.locator('button:has-text("More Filters"), button:has-text("More Filter"), [class*="filter"]').first();
+        this.searchInput = page.locator('input[placeholder*="Application Name" i], input[placeholder*="Name" i], input[placeholder*="Search" i], input[type="text"]').first();
         this.filterStatus = page.locator('select[name="status"]');
         this.filterIntake = page.locator('select[name="intake"]');
 

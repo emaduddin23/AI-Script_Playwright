@@ -50,5 +50,30 @@ test.describe('Applications Page Smoke Tests', () => {
       expect(firstRow.date).toBeTruthy();
       expect(firstRow.appId.trim()).toMatch(/^APP\d+/);
     });
+
+    await test.step('Search for collected Application ID and verify search result', async () => {
+      const searchId = firstRow.appId.trim();
+      await applicationsPage.search(searchId);
+      await page.waitForTimeout(3000); // Wait for the table to refresh with search results
+
+      const resultAppId = await applicationsPage.getFirstRowAppId();
+      const resultStudent = await applicationsPage.getFirstRowStudent();
+      const resultUniversity = await applicationsPage.getFirstRowUniversity();
+      const resultStatus = await applicationsPage.getFirstRowStatus();
+      const resultDate = await applicationsPage.getFirstRowDate();
+
+      console.log(`
+      ================ SEARCH RESULTS ================
+      Searched ID: ${searchId}
+      Result APP ID: ${resultAppId.trim()}
+      Result Student: ${resultStudent.trim()}
+      Result University: ${resultUniversity.trim()}
+      Result Status: ${resultStatus.trim()}
+      Result Date: ${resultDate.trim()}
+      ================================================
+      `);
+
+      expect(resultAppId.trim()).toBe(searchId);
+    });
   });
 });

@@ -17,6 +17,10 @@ class ApplicationsPage {
     }
 
     async search(term) {
+        if (await this.locators.moreFiltersButton.count() > 0) {
+            await this.locators.moreFiltersButton.click();
+            await this.page.waitForTimeout(1000); // wait for filters panel to expand
+        }
         await this.locators.searchInput.fill(term);
         await this.locators.searchInput.press('Enter');
     }
