@@ -17,32 +17,38 @@ test.describe('Applications Page Smoke Tests', () => {
     test.setTimeout(120000);
     const applicationsPage = new ApplicationsPage(page);
 
-    await test.step('Navigate to Applications page', async () => {
+    await test.step('Navigate and wait for table', async () => {
       await applicationsPage.goto();
       await applicationsPage.locators.applicationsTable.waitFor({ state: 'visible', timeout: 10000 });
     });
 
-    await test.step('Verify total items text and table presence', async () => {
-      const totalText = await applicationsPage.getTotalItemsText().catch(() => null);
-      console.log(`Total Items: ${totalText?.trim() || 'nai'}`);
-      expect(await applicationsPage.locators.applicationsTable.count()).toBeGreaterThan(0);
-    });
-
-    await test.step('Fetch and validate first row fields', async () => {
+    const firstRow = await test.step('Collect first row values from Applications table', async () => {
+      const totalText = await applicationsPage.getTotalItemsText();
       const appId = await applicationsPage.getFirstRowAppId();
       const student = await applicationsPage.getFirstRowStudent();
       const university = await applicationsPage.getFirstRowUniversity();
       const status = await applicationsPage.getFirstRowStatus();
       const date = await applicationsPage.getFirstRowDate();
 
-     console.log(`APP ID: ${appId || 'nai'}`);
-console.log(`Student: ${student || 'nai'}`);
-console.log(`University: ${university || 'nai'}`);
-console.log(`Status: ${status || 'nai'}`);
-console.log(`Date: ${date || 'nai'}`);
+      return { totalText, appId, student, university, status, date };
+    });
 
-      expect(appId).toBeTruthy();
+    await test.step('Validate first row values from Applications table', async () => {
+      console.log(`Total Items: ${firstRow.totalText}`);
+      console.log(`First Row Table Data:
+      APP ID: ${firstRow.appId}
+      Student: ${firstRow.student}
+      University: ${firstRow.university}
+      Status: ${firstRow.status}
+      Date: ${firstRow.date}`);
+
+      expect(await applicationsPage.locators.applicationsTable.count()).toBeGreaterThan(0);
+      expect(firstRow.appId).toBeTruthy();
+      expect(firstRow.student).toBeTruthy();
+      expect(firstRow.university).toBeTruthy();
+      expect(firstRow.status).toBeTruthy();
+      expect(firstRow.date).toBeTruthy();
+      expect(firstRow.appId.trim()).toMatch(/^APP\d+/);
     });
   });
-
 });

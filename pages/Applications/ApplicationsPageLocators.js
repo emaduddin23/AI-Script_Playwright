@@ -1,8 +1,7 @@
 class ApplicationsPageLocators {
     constructor(page) {
         this.page = page;
-        // Primary navigation/link to Applications (adjust selector if different)
-        this.applicationsNav = page.locator('a:has-text("Applications")');
+        this.applicationsNav = page.locator('a[href="/applications"]');
 
         // Search and filters
         this.searchInput = page.locator('input[placeholder="Search"]');
@@ -15,8 +14,8 @@ class ApplicationsPageLocators {
         this.firstRowAppId = this.firstRow.locator('td').nth(0);
         this.firstRowStudent = this.firstRow.locator('td').nth(1);
         this.firstRowUniversity = this.firstRow.locator('td').nth(2);
-        this.firstRowStatus = this.firstRow.locator('td').nth(3);
-        this.firstRowDate = this.firstRow.locator('td').nth(4);
+        this.firstRowStatus = this.firstRow.locator('td').nth(12);
+        this.firstRowDate = this.firstRow.locator('td').nth(11);
 
         // Table-level helpers
         this.totalItemsText = page.locator('text=/Total \\d+ items/').first();
