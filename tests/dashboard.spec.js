@@ -17,119 +17,166 @@ test.describe('Dashboard Statistics Tests', () => {
     test.setTimeout(120000);
     const dashboardPage = new DashboardPage(page);
 
-    // Verify Greeting
-    await dashboardPage.verifyGreeting('Afsana Alam');
+    await test.step('Verify greeting and fetch dashboard stats', async () => {
+      await dashboardPage.verifyGreeting('Afsana Alam');
+    });
 
-    // Get statistics values
-    const totalApplications = await dashboardPage.getTotalApplicationsCount();
-    const totalStudents = await dashboardPage.getTotalStudentsCount();
-    const newApplications = await dashboardPage.getNewApplicationsCount();
+    const stats = await test.step('Collect all dashboard card values', async () => {
+      const totalApplications = await dashboardPage.getTotalApplicationsCount();
+      const totalStudents = await dashboardPage.getTotalStudentsCount();
+      const newApplications = await dashboardPage.getNewApplicationsCount();
+      const submittedToUniversity = await dashboardPage.getSubmittedToUniversityCount();
+      const conditionalOfferLetter = await dashboardPage.getConditionalOfferLetterCount();
+      const unconditionalOfferLetter = await dashboardPage.getUnconditionalOfferLetterCount();
+      const applicationCancelled = await dashboardPage.getApplicationCancelledCount();
+      const registered = await dashboardPage.getRegisteredCount();
+      const conversionRate = await dashboardPage.getConversionRate();
 
-    const submittedToUniversity = await dashboardPage.getSubmittedToUniversityCount();
-    const conditionalOfferLetter = await dashboardPage.getConditionalOfferLetterCount();
-    const unconditionalOfferLetter = await dashboardPage.getUnconditionalOfferLetterCount();
-    const applicationCancelled = await dashboardPage.getApplicationCancelledCount();
-    const registered = await dashboardPage.getRegisteredCount();
-    const conversionRate = await dashboardPage.getConversionRate();
+      return {
+        totalApplications,
+        totalStudents,
+        newApplications,
+        submittedToUniversity,
+        conditionalOfferLetter,
+        unconditionalOfferLetter,
+        applicationCancelled,
+        registered,
+        conversionRate,
+      };
+    });
 
-    console.log(`Total Applications: ${totalApplications}`);
-    console.log(`Total Students: ${totalStudents}`);
-    console.log(`New Applications: ${newApplications}`);
-    console.log(`Submitted to University: ${submittedToUniversity}`);
-    console.log(`Conditional Offer Letter: ${conditionalOfferLetter}`);
-    console.log(`Unconditional Offer Letter: ${unconditionalOfferLetter}`);
-    console.log(`Application Cancelled: ${applicationCancelled}`);
-    console.log(`Registered: ${registered}`);
-    console.log(`Conversion Rate: ${conversionRate}`);
+    await test.step('Log and validate collected dashboard stats', async () => {
+      console.log(`Total Applications: ${stats.totalApplications}`);
+      console.log(`Total Students: ${stats.totalStudents}`);
+      console.log(`New Applications: ${stats.newApplications}`);
+      console.log(`Submitted to University: ${stats.submittedToUniversity}`);
+      console.log(`Conditional Offer Letter: ${stats.conditionalOfferLetter}`);
+      console.log(`Unconditional Offer Letter: ${stats.unconditionalOfferLetter}`);
+      console.log(`Application Cancelled: ${stats.applicationCancelled}`);
+      console.log(`Registered: ${stats.registered}`);
+      console.log(`Conversion Rate: ${stats.conversionRate}`);
 
-    // Assertions - Verify they are not null or undefined
-    expect(totalApplications).toBeTruthy();
-    expect(totalStudents).toBeTruthy();
-
-    expect(newApplications).toBeTruthy();
-    expect(submittedToUniversity).toBeTruthy();
-    expect(conditionalOfferLetter).toBeTruthy();
-    expect(unconditionalOfferLetter).toBeTruthy();
-    expect(applicationCancelled).toBeTruthy();
-    expect(registered).toBeTruthy();
-    expect(conversionRate).toBeTruthy();
+      expect(stats.totalApplications).toBeTruthy();
+      expect(stats.totalStudents).toBeTruthy();
+      expect(stats.newApplications).toBeTruthy();
+      expect(stats.submittedToUniversity).toBeTruthy();
+      expect(stats.conditionalOfferLetter).toBeTruthy();
+      expect(stats.unconditionalOfferLetter).toBeTruthy();
+      expect(stats.applicationCancelled).toBeTruthy();
+      expect(stats.registered).toBeTruthy();
+      expect(stats.conversionRate).toBeTruthy();
+    });
   });
 
   test('Should click dashboard statistics cards and verify counts', async ({ page }) => {
     test.setTimeout(180000);
     const dashboardPage = new DashboardPage(page);
-    await dashboardPage.verifyTotalApplicationsNavigation();
-    await dashboardPage.verifyNewApplicationsNavigation();
-    await dashboardPage.verifySubmittedToUniversityNavigation();
-    await dashboardPage.verifyConditionalOfferLetterNavigation();
-    await dashboardPage.verifyUnconditionalOfferLetterNavigation();
-    await dashboardPage.verifyApplicationCancelledNavigation();
-    await dashboardPage.verifyRegisteredNavigation();
+
+    await test.step('Verify Total Applications card navigation', async () => {
+      await dashboardPage.verifyTotalApplicationsNavigation();
+    });
+
+    await test.step('Verify New Applications card navigation', async () => {
+      await dashboardPage.verifyNewApplicationsNavigation();
+    });
+
+    await test.step('Verify Submitted to University card navigation', async () => {
+      await dashboardPage.verifySubmittedToUniversityNavigation();
+    });
+
+    await test.step('Verify Conditional Offer Letter card navigation', async () => {
+      await dashboardPage.verifyConditionalOfferLetterNavigation();
+    });
+
+    await test.step('Verify Unconditional Offer Letter card navigation', async () => {
+      await dashboardPage.verifyUnconditionalOfferLetterNavigation();
+    });
+
+    await test.step('Verify Application Cancelled card navigation', async () => {
+      await dashboardPage.verifyApplicationCancelledNavigation();
+    });
+
+    await test.step('Verify Registered card navigation', async () => {
+      await dashboardPage.verifyRegisteredNavigation();
+    });
   });
 
   test('Should verify first row of New Applications table', async ({ page }) => {
     test.setTimeout(60000);
     const dashboardPage = new DashboardPage(page);
 
-    const appId = await dashboardPage.getFirstRowAppId();
-    const student = await dashboardPage.getFirstRowStudent();
-    const university = await dashboardPage.getFirstRowUniversity();
-    const consultant = await dashboardPage.getFirstRowConsultant();
-    const admissionOfficer = await dashboardPage.getFirstRowAdmissionOfficer();
-    const assessment = await dashboardPage.getFirstRowAssessment();
-    const date = await dashboardPage.getFirstRowDate();
+    const firstRow = await test.step('Collect first row values from New Applications table', async () => {
+      const appId = await dashboardPage.getFirstRowAppId();
+      const student = await dashboardPage.getFirstRowStudent();
+      const university = await dashboardPage.getFirstRowUniversity();
+      const consultant = await dashboardPage.getFirstRowConsultant();
+      const admissionOfficer = await dashboardPage.getFirstRowAdmissionOfficer();
+      const assessment = await dashboardPage.getFirstRowAssessment();
+      const date = await dashboardPage.getFirstRowDate();
 
-    console.log(`First Row Table Data:
-      APP ID: ${appId}
-      Student: ${student}
-      University: ${university}
-      Consultant: ${consultant}
-      Admission Officer: ${admissionOfficer}
-      Assessment: ${assessment}
-      Date: ${date}`);
+      return { appId, student, university, consultant, admissionOfficer, assessment, date };
+    });
 
-    expect(appId).toBeTruthy();
-    expect(student).toBeTruthy();
-    expect(university).toBeTruthy();
-    expect(consultant).toBeTruthy();
-    expect(admissionOfficer).toBeTruthy();
-    expect(assessment).toBeTruthy();
-    expect(date).toBeTruthy();
-    
-    expect(appId.trim()).toMatch(/^APP\d+/);
+    await test.step('Validate first row values from New Applications table', async () => {
+      console.log(`First Row Table Data:
+      APP ID: ${firstRow.appId}
+      Student: ${firstRow.student}
+      University: ${firstRow.university}
+      Consultant: ${firstRow.consultant}
+      Admission Officer: ${firstRow.admissionOfficer}
+      Assessment: ${firstRow.assessment}
+      Date: ${firstRow.date}`);
+
+      expect(firstRow.appId).toBeTruthy();
+      expect(firstRow.student).toBeTruthy();
+      expect(firstRow.university).toBeTruthy();
+      expect(firstRow.consultant).toBeTruthy();
+      expect(firstRow.admissionOfficer).toBeTruthy();
+      expect(firstRow.assessment).toBeTruthy();
+      expect(firstRow.date).toBeTruthy();
+      expect(firstRow.appId.trim()).toMatch(/^APP\d+/);
+    });
   });
 
   test('Should verify Ready to Apply count', async ({ page }) => {
     test.setTimeout(60000);
     const dashboardPage = new DashboardPage(page);
 
-    const readyToApply = await dashboardPage.getReadyToApplyCount();
-    console.log(`Ready to Apply Count: ${readyToApply}`);
+    const readyToApply = await test.step('Get Ready to Apply count from dashboard', async () => {
+      return await dashboardPage.getReadyToApplyCount();
+    });
 
-    // Value should be a number (can be 0)
-    expect(readyToApply).not.toBeNull();
-    expect(readyToApply.trim()).toMatch(/^\d+$/);
+    await test.step('Validate Ready to Apply count format', async () => {
+      console.log(`Ready to Apply Count: ${readyToApply}`);
+      expect(readyToApply).not.toBeNull();
+      expect(readyToApply.trim()).toMatch(/^\d+$/);
+    });
   });
 
   test('Should verify first row of Admission Officer table', async ({ page }) => {
     test.setTimeout(60000);
     const dashboardPage = new DashboardPage(page);
 
-    const id = await dashboardPage.getAdmOfficerFirstRowId();
-    const name = await dashboardPage.getAdmOfficerFirstRowName();
-    const email = await dashboardPage.getAdmOfficerFirstRowEmail();
-    const applications = await dashboardPage.getAdmOfficerFirstRowApplications();
+    const admOfficer = await test.step('Collect first row from Admission Officer table', async () => {
+      const id = await dashboardPage.getAdmOfficerFirstRowId();
+      const name = await dashboardPage.getAdmOfficerFirstRowName();
+      const email = await dashboardPage.getAdmOfficerFirstRowEmail();
+      const applications = await dashboardPage.getAdmOfficerFirstRowApplications();
+      return { id, name, email, applications };
+    });
 
-    console.log(`Admission Officer First Row:
-      UAPP ID: ${id}
-      Name: ${name}
-      Email: ${email}
-      Applications: ${applications}`);
+    await test.step('Validate first row data from Admission Officer table', async () => {
+      console.log(`Admission Officer First Row:
+      UAPP ID: ${admOfficer.id}
+      Name: ${admOfficer.name}
+      Email: ${admOfficer.email}
+      Applications: ${admOfficer.applications}`);
 
-    expect(id.trim()).toMatch(/^ADO\d+/);
-    expect(name).toBeTruthy();
-    expect(email).toContain('@');
-    expect(applications).toBeTruthy();
+      expect(admOfficer.id.trim()).toMatch(/^ADO\d+/);
+      expect(admOfficer.name).toBeTruthy();
+      expect(admOfficer.email).toContain('@');
+      expect(admOfficer.applications).toBeTruthy();
+    });
   });
 
 });
