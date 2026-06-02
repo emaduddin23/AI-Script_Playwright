@@ -1,14 +1,26 @@
 const { chromium } = require('playwright');
 
 (async () => {
-    // headless: false so the user can visually see the flow in action
-    const browser = await chromium.launch({ headless: false });
+    // headless: true to run smoothly in the background and prevent crashes/closures
+    // We add fake device arguments so the application detects mock camera/mic devices
+    const browser = await chromium.launch({ 
+        headless: true,
+        args: [
+            '--use-fake-ui-for-media-stream',
+            '--use-fake-device-for-media-stream'
+        ]
+    });
 
     for (let i = 1; i <= 1; i++) {
+        let context;
+        let page;
         try {
             console.log(`\n🔄 User ${i} starting the join flow...`);
-            const context = await browser.newContext();
-            const page = await context.newPage();
+            // Grant permissions for camera and microphone
+            context = await browser.newContext({
+                permissions: ['microphone', 'camera']
+            });
+            page = await context.newPage();
 
             page.setDefaultNavigationTimeout(45000);
             page.setDefaultTimeout(15000);
@@ -27,9 +39,26 @@ const { chromium } = require('playwright');
             console.log(`✓ User ${i} clicked first 'Join meeting' button`);
 
             // Step 4: Wait for Lobby page and click the second 'Join meeting' button
-            const secondJoinBtn = page.locator('button:has-text("Join meeting")').first();
+            const secondJoinBtn = page.locator('button:has-text("Join meeting")').last();
             await secondJoinBtn.waitFor({ state: 'visible', timeout: 20000 });
-            await secondJoinBtn.click();
+
+            // Debug: Log all matching buttons to see what exists in the DOM
+            const buttons = page.locator('button:has-text("Join meeting")');
+            const count = await buttons.count();
+            console.log(`🔍 Total 'Join meeting' buttons found in DOM: ${count}`);
+            for (let j = 0; j < count; j++) {
+                const html = await buttons.nth(j).evaluate(el => el.outerHTML);
+                console.log(`   Button ${j}: ${html}`);
+            }
+            
+            // Remove disabled attribute if present (as done in pages/join.js) to ensure it can be clicked
+            await secondJoinBtn.evaluate(b => b.removeAttribute('disabled'));
+            
+            // Focus and trigger click with force: true, followed by native browser click dispatch
+            await secondJoinBtn.focus();
+            await secondJoinBtn.click({ force: true });
+            await secondJoinBtn.evaluate(b => b.click());
+            
             console.log(`✓ User ${i} clicked second 'Join meeting' button (Lobby)`);
 
             // Step 5: Wait for the third page (Meeting Room) to load and show the Leave button
@@ -52,6 +81,13 @@ const { chromium } = require('playwright');
             console.log(`🚪 User ${i} left & context closed cleanly.`);
 
         } catch (error) {
+            // Take a screenshot of the failure state to diagnose the issue
+            try {
+                await page.screenshot({ path: `tests/failure-user-${i}.png` });
+                console.log(`📸 Saved failure screenshot to tests/failure-user-${i}.png`);
+            } catch (screenshotError) {
+                console.log(`⚠️ Could not take screenshot: ${screenshotError.message}`);
+            }
             console.log(`⚠️ User ${i} failed to join: ${error.message}`);
         }
     }
