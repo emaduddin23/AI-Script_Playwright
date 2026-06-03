@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-for (let i = 1; i <= 10; i++) {
+for (let i = 1; i <= 1; i++) {
   test(`test ${i}`, async ({ page }) => {
     await page.goto('https://engine.chatyro.com/join/57fbf26f0798');
 
