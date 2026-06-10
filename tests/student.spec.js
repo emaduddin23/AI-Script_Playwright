@@ -1,31 +1,23 @@
-const { test, expect } = require('@playwright/test');
-const { LoginPage } = require('../pages/Login/LoginPage');
-const { StudentPage } = require('../pages/Student/StudentPage');
+const { test, expect } = require('./fixtures');
 
 test.describe('Student Menu Tests', () => {
   test.describe.configure({ mode: 'serial' });
   test.use({ ignoreHTTPSErrors: true });
 
-  test.beforeEach(async ({ page }) => {
-    // Login before each test
-    const loginPage = new LoginPage(page);
+  test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
-    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
   });
 
-  test('Should navigate to Student Menu and verify URL', async ({ page }) => {
+  test('Should navigate to Student Menu and verify URL', async ({ studentPage }) => {
     test.setTimeout(60000);
-    const studentPage = new StudentPage(page);
 
     await studentPage.navigateToStudentMenu();
     // The URL might not contain 'student' explicitly. We'll skip this strict check for now.
     // await expect(page).toHaveURL(/.*student/i);
   });
 
-  test('Should add a new student successfully', async ({ page }) => {
+  test('Should add a new student successfully', async ({ studentPage }) => {
     test.setTimeout(90000);
-    const studentPage = new StudentPage(page);
 
     await studentPage.navigateToStudentMenu();
 

@@ -1,5 +1,8 @@
 const { defineConfig, devices } = require('@playwright/test');
+const path = require('path');
 require('dotenv').config();
+
+const authFile = path.join(__dirname, 'playwright/.auth/user.json');
 
 module.exports = defineConfig({
   testDir: './tests',
@@ -15,8 +18,16 @@ module.exports = defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.js/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: authFile,
+      },
+      dependencies: ['setup'],
     },
   ],
 });

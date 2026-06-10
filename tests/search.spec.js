@@ -1,7 +1,4 @@
-const { test, expect } = require('@playwright/test');
-const { LoginPage } = require('../pages/Login/LoginPage');
-const { DashboardPage } = require('../pages/Dashboard/DashboardPage');
-const { SearchPage } = require('../pages/Search/SearchPage');
+const { test, expect } = require('./fixtures');
 
 // This file only tests the Search & Apply feature
 test.describe('Search & Apply Tests', () => {
@@ -9,18 +6,13 @@ test.describe('Search & Apply Tests', () => {
   test.use({ ignoreHTTPSErrors: true });
 
   // This "beforeEach" runs BEFORE every test in this file
-  // It logs in automatically so we are ready to search!
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
-    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
   });
 
-  test('Should find a student and click Apply Now', async ({ page }) => {
+  test('Should find a student and click Apply Now', async ({ page, searchPage }) => {
     // Give this test 3 full minutes to run!
     test.setTimeout(180000);
-    const searchPage = new SearchPage(page);
 
     // 1. Navigate to Search & Apply
     await searchPage.goto();

@@ -1,21 +1,15 @@
-const { test, expect } = require('@playwright/test');
-const { LoginPage } = require('../pages/Login/LoginPage');
-const { MyProfilePage } = require('../pages/MyProfile/MyProfilePage');
+const { test, expect } = require('./fixtures');
 
 test.describe('My Profile Tests', () => {
   test.describe.configure({ mode: 'serial' });
   test.use({ ignoreHTTPSErrors: true });
 
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
-    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
   });
 
-  test('Should navigate to My Profile page', async ({ page }) => {
+  test('Should navigate to My Profile page', async ({ page, myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
     await expect(page).toHaveURL(/.*profile.*/);
@@ -25,9 +19,8 @@ test.describe('My Profile Tests', () => {
     expect(title.trim()).toBe('Profile');
   });
 
-  test('Should verify user name on profile page', async ({ page }) => {
+  test('Should verify user name on profile page', async ({ myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
 
@@ -36,9 +29,8 @@ test.describe('My Profile Tests', () => {
     expect(userName).toContain('Afsana Alam');
   });
 
-  test('Should verify Admission Manager Details section', async ({ page }) => {
+  test('Should verify Admission Manager Details section', async ({ myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
 
@@ -47,9 +39,8 @@ test.describe('My Profile Tests', () => {
     expect(section.trim()).toBe('Admission Manager Details');
   });
 
-  test('Should verify UAPP section is visible', async ({ page }) => {
+  test('Should verify UAPP section is visible', async ({ myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
 
@@ -58,9 +49,8 @@ test.describe('My Profile Tests', () => {
     expect(uapp.trim()).toBe('UAPP');
   });
 
-  test('Should verify Assigned Admission Officer section', async ({ page }) => {
+  test('Should verify Assigned Admission Officer section', async ({ myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
 
@@ -75,9 +65,8 @@ test.describe('My Profile Tests', () => {
     expect(officerNames.length).toBeGreaterThan(0);
   });
 
-  test('Should click Applications tab and verify content loads', async ({ page }) => {
+  test('Should click Applications tab and verify content loads', async ({ page, myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
     await myProfilePage.clickApplicationsTab();
@@ -88,9 +77,8 @@ test.describe('My Profile Tests', () => {
     console.log('Applications tab content loaded successfully.');
   });
 
-  test('Should click Officers tab and verify content loads', async ({ page }) => {
+  test('Should click Officers tab and verify content loads', async ({ page, myProfilePage }) => {
     test.setTimeout(60000);
-    const myProfilePage = new MyProfilePage(page);
 
     await myProfilePage.navigateToMyProfile();
     await myProfilePage.clickOfficersTab();

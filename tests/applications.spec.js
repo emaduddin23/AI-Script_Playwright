@@ -1,21 +1,15 @@
-const { test, expect } = require('@playwright/test');
-const { LoginPage } = require('../pages/Login/LoginPage');
-const { ApplicationsPage } = require('../pages/Applications/ApplicationsPage');
+const { test, expect } = require('./fixtures');
 
 test.describe('Applications Page Smoke Tests', () => {
   test.describe.configure({ mode: 'serial' });
   test.use({ ignoreHTTPSErrors: true });
 
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.enterEmailAndContinue(process.env.TEST_USER_EMAIL);
-    await loginPage.enterPasswordAndLogin(process.env.TEST_USER_PASSWORD);
   });
 
-  test('Open Applications and verify main UI elements', async ({ page }) => {
+  test('Open Applications and verify main UI elements', async ({ page, applicationsPage }) => {
     test.setTimeout(120000);
-    const applicationsPage = new ApplicationsPage(page);
 
     await test.step('Navigate and wait for table', async () => {
       await applicationsPage.goto();

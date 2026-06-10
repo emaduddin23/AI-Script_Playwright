@@ -4,6 +4,7 @@ const { DashboardPage } = require('../pages/Dashboard/DashboardPage');
 
 // This file only tests the Login feature
 test.describe('Login Tests', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
   
  test('Should login successfully with valid credentials', async ({ page }) => {
   const loginPage = new LoginPage(page);
