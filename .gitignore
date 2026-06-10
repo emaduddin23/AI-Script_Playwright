@@ -32,4 +32,11 @@ tests/debug_*.spec.js
 *.png
 *.jpg
 *.jpeg
+
+# Playwright Test Agents
+.github/agents/
+.github/workflows/copilot-setup-steps.yml
+.vscode/mcp.json
+specs/
+tests/seed.spec.ts
 images/
