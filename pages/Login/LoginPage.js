@@ -8,10 +8,11 @@ class LoginPage {
   }
 
   async goto() {
-    await this.page.goto('http://portal-test.uapp.uk/');
+    await this.page.goto('https://portal-test.uapp.uk/', { waitUntil: 'domcontentloaded' });
   }
 
   async enterEmailAndContinue(email) {
+    await this.loginLocators.emailInput.waitFor({ state: 'visible', timeout: 60000 });
     await this.loginLocators.emailInput.fill(email);
   }
 
